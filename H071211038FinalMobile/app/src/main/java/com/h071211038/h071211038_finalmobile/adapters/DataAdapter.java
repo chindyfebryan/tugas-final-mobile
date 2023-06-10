@@ -25,6 +25,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolde
     private List<MovieResponse> movieResponses;
     private List<TvShowsResponse> tvShowsResponses;
     private boolean isMovie;
+    private String firstAirDate;
 
     public DataAdapter(Context context, boolean isMovie) {
         this.context = context;
@@ -71,7 +72,14 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolde
                     .load("https://image.tmdb.org/t/p/original" + tvShowsResponse.getPosterPath())
                     .into(holder.ivPoster);
             holder.tvTitle.setText(tvShowsResponse.getName());
-            holder.tvReleaseYear.setText(tvShowsResponse.getFirstAirDate().substring(0, 4));
+
+            if (tvShowsResponse.getFirstAirDate().length() > 3) {
+                firstAirDate = tvShowsResponse.getFirstAirDate().substring(0, 4);
+            } else {
+                firstAirDate = "-";
+            }
+
+            holder.tvReleaseYear.setText(firstAirDate);
 
             holder.itemView.setOnClickListener(view -> {
                 Intent intent = new Intent(context, DetailActivity.class);
