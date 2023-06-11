@@ -65,6 +65,7 @@
                         android:id="@+id/poster"
                         android:layout_width="100dp"
                         android:layout_height="150dp"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/baseline_broken_image_24" />
 
                 </androidx.cardview.widget.CardView>
