@@ -84,7 +84,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolde
             holder.itemView.setOnClickListener(view -> {
                 Intent intent = new Intent(context, DetailActivity.class);
                 intent.putExtra(DetailActivity.KEY_TV_SHOW, tvShowsResponse);
-                intent.putExtra(DetailActivity.KEY_IS_MOVIE, this.isMovie);
                 context.startActivity(intent);
             });
         }

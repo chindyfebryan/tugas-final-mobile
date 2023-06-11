@@ -1,10 +1,13 @@
 package com.h071211038.h071211038_finalmobile.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,22 +17,34 @@ import com.h071211038.h071211038_finalmobile.R;
 import com.h071211038.h071211038_finalmobile.db.DatabaseContract;
 import com.h071211038.h071211038_finalmobile.db.FavoriteHelper;
 import com.h071211038.h071211038_finalmobile.entity.Favorite;
+import com.h071211038.h071211038_finalmobile.fragments.CastFragment;
+import com.h071211038.h071211038_finalmobile.fragments.MoviesFragment;
+import com.h071211038.h071211038_finalmobile.models.GenreResponse;
+import com.h071211038.h071211038_finalmobile.models.MovieCastListResponse;
+import com.h071211038.h071211038_finalmobile.models.MovieCastResponse;
+import com.h071211038.h071211038_finalmobile.models.GenreListResponse;
 import com.h071211038.h071211038_finalmobile.models.MovieResponse;
 import com.h071211038.h071211038_finalmobile.models.TvShowsResponse;
+import com.h071211038.h071211038_finalmobile.networks.ApiConfig;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
 
     public static String KEY_MOVIE= "KEY_MOVIE";
     public static String KEY_TV_SHOW= "KEY_TV_SHOW";
-    public static String KEY_IS_MOVIE = "KEY_IS_MOVIE";
     private String title, backdropPath, posterPath, releaseDate, overview;
     private int icon, dataId;
     private Double voteAverage;
+    private TextView tvGenres;
     private FavoriteHelper favoriteHelper;
     private MovieResponse movieResponse;
     private TvShowsResponse tvShowsResponse;
@@ -45,6 +60,7 @@ public class DetailActivity extends AppCompatActivity {
         TextView tvRate = findViewById(R.id.rate);
         TextView tvReleaseDate = findViewById(R.id.release_date);
         TextView tvOverview = findViewById(R.id.overview);
+        tvGenres = findViewById(R.id.genres);
         ImageView ivBackdrop = findViewById(R.id.backdrop);
         ImageView ivPoster = findViewById(R.id.poster);
         ImageView ivIcon = findViewById(R.id.icon);
@@ -76,6 +92,7 @@ public class DetailActivity extends AppCompatActivity {
             releaseDate = tvShowsResponse.getFirstAirDate();
             voteAverage = tvShowsResponse.getVoteAverage();
             overview = tvShowsResponse.getOverview();
+
         } else {
             Favorite favorite = getIntent().getParcelableExtra("favorite");
             icon = favorite.getIcon();
@@ -86,10 +103,12 @@ public class DetailActivity extends AppCompatActivity {
             releaseDate = favorite.getReleaseDate();
             voteAverage = favorite.getVoteAverage();
             overview = favorite.getOverview();
+
         }
 
         Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original" + backdropPath)
+                .placeholder(R.drawable.baseline_broken_image_24)
                 .into(ivBackdrop);
         Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original" + posterPath)
@@ -99,6 +118,10 @@ public class DetailActivity extends AppCompatActivity {
         tvReleaseDate.setText(convertDateFormat(releaseDate));
         tvRate.setText(String.valueOf(voteAverage));
         tvOverview.setText(overview);
+
+        String type = icon == R.drawable.baseline_movie_24_dark_blue ? "movie" : "tv";
+        showGenres(dataId, type);
+        showMovieCasts(dataId, type);
 
         btnBack.setOnClickListener(view -> {
             setResult(0);
@@ -167,6 +190,56 @@ public class DetailActivity extends AppCompatActivity {
             e.printStackTrace();
             return "";
         }
+    }
+
+    private void showGenres(int dataId, String data) {
+        Call<GenreListResponse> client = ApiConfig.getApiService().getGenres(data, dataId, MoviesFragment.API_KEY, "en-US");
+        client.enqueue(new Callback<GenreListResponse>() {
+            @Override
+            public void onResponse(Call<GenreListResponse> call, Response<GenreListResponse>
+                    response) {
+
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        List<GenreResponse> genreResponses = response.body().getGenres();
+                        StringBuilder genresStringBuilder = new StringBuilder();
+
+                        for (GenreResponse genreResponse : genreResponses) {
+                            String genreName = genreResponse.getName();
+                            genresStringBuilder.append(genreName);
+                            genresStringBuilder.append(", ");
+                        }
+
+                        if (genresStringBuilder.length() > 0) {
+                            genresStringBuilder.setLength(genresStringBuilder.length() - 2);
+                        }
+
+                        String concatenatedGenres = genresStringBuilder.toString();
+                        tvGenres.setText(concatenatedGenres);
+
+                    }
+                } else {
+                    if (response.body() != null) {
+                        Log.e("MainActivity", "onFailure: " + response.message());
+                    }
+                }
+
+            }
+            @Override
+            public void onFailure(Call<GenreListResponse> call, Throwable t) {
+                tvGenres.setText("unavailable");
+                Log.e("MainActivity", "onFailure: " + t.getMessage());
+            }
+        });
+    }
+    private void showMovieCasts(int dataId, String data) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        CastFragment castFragment = new CastFragment(dataId, data);
+
+        fragmentManager.beginTransaction()
+                .add(R.id.fragment_container, castFragment, MoviesFragment.class.getSimpleName())
+                .commit();
     }
 
 }

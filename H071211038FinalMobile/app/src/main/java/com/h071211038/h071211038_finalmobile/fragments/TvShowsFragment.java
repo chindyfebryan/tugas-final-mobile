@@ -76,6 +76,10 @@ public class TvShowsFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<TvShowListResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new NoConnectionFragment())
+                        .commit();
                 Log.e("MainActivity", "onFailure: " + t.getMessage());
             }
         });
