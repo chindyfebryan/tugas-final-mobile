@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             + " (%s INTEGER PRIMARY KEY AUTOINCREMENT,"
                             + " %s INTEGER NOT NULL,"
                             + " %s INTEGER NOT NULL,"
-                            + " %s TEXT NOT NULL,"
+                            + " %s TEXT,"
                             + " %s TEXT NOT NULL,"
                             + " %s TEXT NOT NULL,"
                             + " %s TEXT NOT NULL,"
