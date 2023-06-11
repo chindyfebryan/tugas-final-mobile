@@ -132,6 +132,18 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolde
         notifyDataSetChanged();
     }
 
+    public void addMovieResponses(List<MovieResponse> newResponses) {
+        int oldSize = movieResponses.size();
+        movieResponses.addAll(newResponses);
+        notifyItemRangeInserted(oldSize, newResponses.size());
+    }
+
+    public void addTvShowResponses(List<TvShowsResponse> newResponses) {
+        int oldSize = tvShowsResponses.size();
+        tvShowsResponses.addAll(newResponses);
+        notifyItemRangeInserted(oldSize, newResponses.size());
+    }
+
     public static int compareDates(String date1, String date2) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {
