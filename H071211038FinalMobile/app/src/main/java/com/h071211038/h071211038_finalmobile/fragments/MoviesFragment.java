@@ -70,12 +70,14 @@ public class MoviesFragment extends Fragment {
                     }
                 } else {
                     if (response.body() != null) {
+                        progressBar.setVisibility(View.GONE);
                         Log.e("MainActivity", "onFailure: " + response.message());
                     }
                 }
             }
             @Override
             public void onFailure(Call<MovieListResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
                 Log.e("MainActivity", "onFailure: " + t.getMessage());
             }
         });

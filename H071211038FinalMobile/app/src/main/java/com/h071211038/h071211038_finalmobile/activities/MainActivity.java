@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -53,4 +52,5 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
         headerTextView.setText(title);
     }
+
 }
