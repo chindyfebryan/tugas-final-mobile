@@ -2,6 +2,7 @@ package com.h071211038.h071211038_finalmobile.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -16,8 +17,10 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.h071211038.h071211038_finalmobile.R;
@@ -37,6 +40,8 @@ public class FavoritesFragment extends Fragment {
     private TextView textView;
     private FavoriteAdapter favoriteAdapter;
     private Activity activity;
+    private SharedPreferences preferences;
+    private int selectedSort;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,13 +50,22 @@ public class FavoritesFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedSort", selectedSort);
+    }
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState != null) {
+            selectedSort = savedInstanceState.getInt("selectedSort", 0);
+        }
 
         activity = getActivity();
         textView = view.findViewById(R.id.text_view);
         linearLayout = view.findViewById(R.id.linear_layout);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        Spinner sortSpinner = view.findViewById(R.id.sort_spinner);
         ProgressBar progressBar = view.findViewById(R.id.progress_bar);
         favoriteAdapter = new FavoriteAdapter(activity);
 
@@ -64,6 +78,48 @@ public class FavoritesFragment extends Fragment {
                 linearLayout.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.GONE);
                 favoriteAdapter.setFavorites(favorites);
+                sortSpinner.setSelection(selectedSort);
+
+                sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        switch(i) {
+                            case 0:
+                                favoriteAdapter.restoreOriginalOrderFavorite();
+                                break;
+                            case 1:
+                                favoriteAdapter.sortFavoriteByTitle(favorites, "ASC");
+                                break;
+                            case 2:
+                                favoriteAdapter.sortFavoriteByTitle(favorites, "DESC");
+                                break;
+                            case 3:
+                                favoriteAdapter.sortFavoriteByRate(favorites, "ASC");
+                                break;
+                            case 4:
+                                favoriteAdapter.sortFavoriteByRate(favorites, "DESC");
+                                break;
+                            case 5:
+                                favoriteAdapter.sortFavoriteByReleaseDate(favorites, "ASC");
+                                break;
+                            case 6:
+                                favoriteAdapter.sortFavoriteByReleaseDate(favorites, "DESC");
+                                break;
+                        }
+
+                        preferences = getActivity().getSharedPreferences("SortPreferences", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        selectedSort = i;
+                        editor.putInt("selectedSort", i);
+                        editor.apply();
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
 
             } else {
                 progressBar.setVisibility(View.GONE);

@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.MoviesFragment"
-    android:gravity="center"
     android:orientation="vertical">
 
     <ProgressBar
@@ -12,16 +11,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:visibility="gone"/>
+        android:layout_gravity="center" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/movie_recycler_view"
+    <LinearLayout
+        android:id="@+id/linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        tools:listitem="@layout/item_layout"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
-        android:visibility="gone"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Spinner
+            android:id="@+id/sort_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:spinnerMode="dropdown"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:entries="@array/sort_by"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/movie_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_layout"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"/>
+    </LinearLayout>
 
 </LinearLayout>

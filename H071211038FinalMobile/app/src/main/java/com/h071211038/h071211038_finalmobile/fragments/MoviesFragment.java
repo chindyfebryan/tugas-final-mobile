@@ -12,7 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.h071211038.h071211038_finalmobile.R;
 import com.h071211038.h071211038_finalmobile.adapters.DataAdapter;
@@ -43,8 +46,10 @@ public class MoviesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Spinner sortSpinner = view.findViewById(R.id.sort_spinner);
 
         RecyclerView recyclerView = view.findViewById(R.id.movie_recycler_view);
+        LinearLayout linearLayout = view.findViewById(R.id.linear_layout);
 
         DataAdapter dataAdapter = new DataAdapter(getActivity(), true);
 
@@ -61,9 +66,44 @@ public class MoviesFragment extends Fragment {
                     response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
+                        linearLayout.setVisibility(View.VISIBLE);
                         List<MovieResponse> movieResponseList = response.body().getResults();
 
                         dataAdapter.setMovieResponses(movieResponseList);
+
+                        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                switch(i) {
+                                    case 0:
+                                        dataAdapter.restoreOriginalOrderMovie();
+                                        break;
+                                    case 1:
+                                        dataAdapter.sortMovieByTitle(movieResponseList, "ASC");
+                                        break;
+                                    case 2:
+                                        dataAdapter.sortMovieByTitle(movieResponseList, "DESC");
+                                        break;
+                                    case 3:
+                                        dataAdapter.sortMovieByRate(movieResponseList, "ASC");
+                                        break;
+                                    case 4:
+                                        dataAdapter.sortMovieByRate(movieResponseList, "DESC");
+                                        break;
+                                    case 5:
+                                        dataAdapter.sortMovieByReleaseDate(movieResponseList, "ASC");
+                                        break;
+                                    case 6:
+                                        dataAdapter.sortMovieByReleaseDate(movieResponseList, "DESC");
+                                        break;
+                                }
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+
+                            }
+                        });
 
                         recyclerView.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);

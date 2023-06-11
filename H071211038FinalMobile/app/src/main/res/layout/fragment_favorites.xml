@@ -15,9 +15,18 @@
     <LinearLayout
         android:id="@+id/linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
+
+        <Spinner
+            android:id="@+id/sort_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:spinnerMode="dropdown"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:entries="@array/sort_by"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import com.h071211038.h071211038_finalmobile.fragments.TvShowsFragment;
 public class MainActivity extends AppCompatActivity {
 
     private TextView headerTextView;
+    private LinearLayout activeButton;
+    private LinearLayout btnHome, btnTvShows, btnFavorite;
     private MoviesFragment moviesFragment;
 
     @Override
@@ -23,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LinearLayout btnHome = findViewById(R.id.movies_button);
-        LinearLayout btnTvShows = findViewById(R.id.tv_shows_button);
-        LinearLayout btnFavorite = findViewById(R.id.favorites_button);
+        btnHome = findViewById(R.id.movies_button);
+        btnTvShows = findViewById(R.id.tv_shows_button);
+        btnFavorite = findViewById(R.id.favorites_button);
         headerTextView = findViewById(R.id.header_text_view);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -36,21 +39,33 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.fragment_container, moviesFragment, MoviesFragment.class.getSimpleName())
                 .commit();
 
-        btnHome.setOnClickListener(view -> showFragment(new MoviesFragment(), "Movies"));
+        setActiveButton(btnHome);
 
-        btnTvShows.setOnClickListener(view -> showFragment(new TvShowsFragment(), "Tv Shows"));
+        btnHome.setOnClickListener(view -> showFragment(new MoviesFragment(), "Movies", btnHome));
 
-        btnFavorite.setOnClickListener(view -> showFragment(new FavoritesFragment(), "Favorites"));
+        btnTvShows.setOnClickListener(view -> showFragment(new TvShowsFragment(), "Tv Shows", btnTvShows));
+
+        btnFavorite.setOnClickListener(view -> showFragment(new FavoritesFragment(), "Favorites", btnFavorite));
 
     }
 
-    public void showFragment(Fragment fragment, String title) {
+    private void setActiveButton(LinearLayout button) {
+        // Ubah latar belakang button yang aktif
+        if (activeButton != null) {
+            activeButton.setBackgroundColor(Color.TRANSPARENT);
+        }
+        button.setBackgroundColor(getResources().getColor(R.color.light_green));
+
+        activeButton = button;
+    }
+    public void showFragment(Fragment fragment, String title, LinearLayout button) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
         headerTextView.setText(title);
+        setActiveButton(button);
     }
 
 }

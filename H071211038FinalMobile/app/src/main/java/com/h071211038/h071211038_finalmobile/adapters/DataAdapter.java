@@ -17,13 +17,21 @@ import com.h071211038.h071211038_finalmobile.activities.DetailActivity;
 import com.h071211038.h071211038_finalmobile.models.MovieResponse;
 import com.h071211038.h071211038_finalmobile.models.TvShowsResponse;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolder> {
 
     private Context context;
     private List<MovieResponse> movieResponses;
     private List<TvShowsResponse> tvShowsResponses;
+    private List<MovieResponse> originalMovieResponses;
+    private List<TvShowsResponse> originalTvShowsResponses;
     private boolean isMovie;
     private String firstAirDate;
 
@@ -33,13 +41,107 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MovieViewHolde
     }
 
     public void setMovieResponses(List<MovieResponse> movieResponses) {
+        this.originalMovieResponses = new ArrayList<>(movieResponses);
         this.movieResponses = movieResponses;
         notifyDataSetChanged();
     }
 
     public void setTvShowsResponses(List<TvShowsResponse> tvShowsResponses) {
+        this.originalTvShowsResponses = new ArrayList<>(tvShowsResponses);
         this.tvShowsResponses= tvShowsResponses;
         notifyDataSetChanged();
+    }
+
+    public void restoreOriginalOrderMovie() {
+        movieResponses.clear();
+        movieResponses.addAll(originalMovieResponses);
+
+        notifyDataSetChanged();
+    }
+
+    public void restoreOriginalOrderTvShows() {
+        tvShowsResponses.clear();
+        tvShowsResponses.addAll(originalTvShowsResponses);
+
+        notifyDataSetChanged();
+    }
+
+    public void sortMovieByTitle(List<MovieResponse> movieResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(movieResponses, (movie1, movie2) -> movie1.getTitle().compareToIgnoreCase(movie2.getTitle()));
+        } else {
+            Collections.sort(movieResponses, (movie1, movie2) -> movie2.getTitle().compareToIgnoreCase(movie1.getTitle()));
+        }
+
+        this.movieResponses = movieResponses;
+        notifyDataSetChanged();
+    }
+
+    public void sortMovieByRate(List<MovieResponse> movieResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(movieResponses, (movie1, movie2) -> Double.compare(movie1.getVoteAverage(), movie2.getVoteAverage()));
+        } else {
+            Collections.sort(movieResponses, (movie1, movie2) -> Double.compare(movie2.getVoteAverage(), movie1.getVoteAverage()));
+        }
+
+        this.movieResponses = movieResponses;
+        notifyDataSetChanged();
+    }
+
+    public void sortMovieByReleaseDate(List<MovieResponse> movieResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(movieResponses, (movie1, movie2) -> compareDates(movie1.getReleaseDate(), movie2.getReleaseDate()));
+        } else {
+            Collections.sort(movieResponses, (movie1, movie2) -> compareDates(movie2.getReleaseDate(), movie1.getReleaseDate()));
+        }
+
+        this.movieResponses = movieResponses;
+        notifyDataSetChanged();
+    }
+
+    public void sortTvShowsByTitle(List<TvShowsResponse> tvShowsResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(DataAdapter.this.tvShowsResponses, (tvShows1, tvShows2) -> tvShows1.getName().compareToIgnoreCase(tvShows2.getName()));
+        } else {
+            Collections.sort(DataAdapter.this.tvShowsResponses, (tvShows1, tvShows2) -> tvShows2.getName().compareToIgnoreCase(tvShows1.getName()));
+        }
+
+        this.tvShowsResponses = tvShowsResponses;
+        notifyDataSetChanged();
+    }
+
+    public void sortTvShowsByRate(List<TvShowsResponse> tvShowsResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(DataAdapter.this.tvShowsResponses, (tvShows1, tvShows2) -> Double.compare(tvShows1.getVoteAverage(), tvShows2.getVoteAverage()));
+        } else {
+            Collections.sort(DataAdapter.this.tvShowsResponses, (tvShows1, tvShows2) -> Double.compare(tvShows2.getVoteAverage(), tvShows1.getVoteAverage()));
+        }
+
+        this.tvShowsResponses = tvShowsResponses;
+        notifyDataSetChanged();
+    }
+
+    public void sortTvShowsByReleaseDate(List<TvShowsResponse> tvShowsResponses, String selectedSort) {
+        if (selectedSort.equals("ASC")) {
+            Collections.sort(tvShowsResponses, (tvShows1, tvShows2) -> compareDates(tvShows1.getFirstAirDate(), tvShows2.getFirstAirDate()));
+        } else {
+            Collections.sort(tvShowsResponses, (tvShows1, tvShows2) -> compareDates(tvShows2.getFirstAirDate(), tvShows2.getFirstAirDate()));
+        }
+
+        this.tvShowsResponses = tvShowsResponses;
+        notifyDataSetChanged();
+    }
+
+    public static int compareDates(String date1, String date2) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            Date d1 = dateFormat.parse(date1);
+            Date d2 = dateFormat.parse(date2);
+            return d1.compareTo(d2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     @NonNull
